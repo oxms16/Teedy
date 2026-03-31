@@ -419,6 +419,9 @@ angular.module('docs',
       }
     });
 
+  // Route fallback to root
+  $urlRouterProvider.otherwise('/');
+
   // Configuring Restangular
   RestangularProvider.setBaseUrl('../api');
 

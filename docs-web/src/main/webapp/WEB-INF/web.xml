@@ -6,6 +6,9 @@
          version="5.0"
          metadata-complete="true">
   <display-name>Teedy</display-name>
+  <welcome-file-list>
+    <welcome-file>src/index.html</welcome-file>
+  </welcome-file-list>
   
   <!-- Proper loader/unloader of ImageIO plugins -->
   <listener>
