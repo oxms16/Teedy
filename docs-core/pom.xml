@@ -227,13 +227,24 @@
     </profile>
   </profiles>
 
-  <build>
+    <build>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
         <filtering>false</filtering>
       </resource>
     </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>${org.apache.maven.plugins.maven-site-plugin.version}</version>
+        <configuration>
+          <outputDirectory>${project.parent.basedir}/target/site/docs-core</outputDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

@@ -224,9 +224,9 @@
             </includes>
           </resource>
         </resources>
-        
+
         <plugins>
-        
+
           <!-- Launch NPM & Grunt -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -258,16 +258,22 @@
               </execution>
             </executions>
           </plugin>
-        
+
           <!-- WAR generation -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>${org.apache.maven.plugins.maven-site-plugin.version}</version>
             <configuration>
-              <warSourceDirectory>${project.basedir}/src/main/webapp/dist</warSourceDirectory>
-              <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+              <outputDirectory>${project.parent.basedir}/target/site/docs-web</outputDirectory>
             </configuration>
           </plugin>
+
         </plugins>
       </build>
     </profile>
