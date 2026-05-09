@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests for MimeTypeUtil.
@@ -50,7 +49,7 @@ public class MimeTypeUtilTest {
 
         try {
             String mimeType = MimeTypeUtil.guessMimeType(tempFile, "file.unknownextensionforteedy");
-            assertNotNull(mimeType);
+            assertEquals(MimeType.DEFAULT, mimeType);
         } finally {
             Files.deleteIfExists(tempFile);
         }
