@@ -41,9 +41,11 @@ pipeline {
         stage('Push Docker image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', params.DOCKER_HUB_CREDENTIALS) {
-                        docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                        docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
+                    retry(3) {
+                        docker.withRegistry('https://index.docker.io/v1/', params.DOCKER_HUB_CREDENTIALS) {
+                            docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
+                            docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
+                        }
                     }
                 }
             }
