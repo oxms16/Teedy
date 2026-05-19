@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_HUB_CREDENTIALS = 'dockerhub_credentials'
-        DOCKER_IMAGE = 'xx/teedy-app'
+        DOCKER_IMAGE = 'oxms16/seteedy'
         DOCKER_TAG = "${env.BUILD_NUMBER}"
     }
     stages {
