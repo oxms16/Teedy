@@ -51,7 +51,7 @@ RUN apt-get update && \
 RUN dpkg-reconfigure -f noninteractive tzdata
 # Install Jetty server
 RUN wget -nv -O /tmp/jetty.tar.gz \
-    "https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${JETTY_VERSION}/jetty-home-${JETTY_VERSION}.tar.gz" \
+"https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-home/${JETTY_VERSION}/jetty-home-${JETTY_VERSION}.tar.gz" \
     && tar xzf /tmp/jetty.tar.gz -C /opt \
     && mv /opt/jetty* /opt/jetty \
     && useradd jetty -U -s /bin/false \
@@ -65,7 +65,7 @@ RUN mkdir /app && \
     cd /app && \
     java -jar /opt/jetty/start.jar --add-modules=server,http,webapp,deploy
 # Add the local file docs.xml and the built WAR file docs-web-*.war to the container's Jetty web applications directory.
-# Allows Jetty to load these web applications at startup.
+#Allows Jetty to load these web applications at startup.
 ADD docs.xml /app/webapps/docs.xml
 ADD docs-web/target/docs-web-*.war /app/webapps/docs.war
 # sets the working directory for any RUN, CMD, ENTRYPOINT, COPY, and ADD instructions that follow it
