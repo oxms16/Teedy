@@ -34,10 +34,12 @@ pipeline {
         stage('Run containers') {
             steps {
                 script {
-                    sh 'docker stop teedy-container-8081 || true'
-                    sh 'docker rm teedy-container-8081 || true'
-                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run('--name teedy-container-8081 -d -p 8081:8080')
-                    sh 'docker ps --filter "name=teedy-container"'
+                    sh 'docker stop seteedy-container-8082 seteedy-container-8083 seteedy-container-8084 || true'
+                    sh 'docker rm seteedy-container-8082 seteedy-container-8083 seteedy-container-8084 || true'
+                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run('--name seteedy-container-8082 -d -p 8082:8080')
+                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run('--name seteedy-container-8083 -d -p 8083:8080')
+                    docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run('--name seteedy-container-8084 -d -p 8084:8080')
+                    sh 'docker ps --filter "name=seteedy-container"'
                 }
             }
         }
