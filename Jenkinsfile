@@ -1,75 +1,58 @@
 pipeline {
     agent any
-
-    parameters {
-        string(name: 'DOCKER_IMAGE', defaultValue: 'your-dockerhub-username/teedy-app', description: 'Docker Hub repository, for example: username/teedy-app')
-        string(name: 'DOCKER_HUB_CREDENTIALS', defaultValue: 'dockerhub_credentials', description: 'Jenkins credentials ID for Docker Hub')
-    }
-
     environment {
-        DOCKER_TAG = "${env.BUILD_NUMBER}"
+        // define environment variable
+        // Jenkins credentials configuration
+        DOCKER_HUB_CREDENTIALS = 'dockerhub_credentials' // Docker Hub credentials ID store in Jenkins
+        // Docker Hub Repository's name
+        DOCKER_IMAGE = 'xx/teedy-app' // your Docker Hub user name and Repository's name
+        DOCKER_TAG = "${env.BUILD_NUMBER}" // use build number as tag
     }
-
     stages {
-        stage('Validate configuration') {
-            steps {
-                script {
-                    if (!params.DOCKER_IMAGE?.trim() || params.DOCKER_IMAGE == 'your-dockerhub-username/teedy-app') {
-                        error 'Set DOCKER_IMAGE to your Docker Hub repository, for example: username/teedy-app'
-                    }
-                    if (!params.DOCKER_HUB_CREDENTIALS?.trim()) {
-                        error 'Set DOCKER_HUB_CREDENTIALS to your Jenkins Docker Hub credentials ID'
-                    }
-                }
-            }
-        }
-
         stage('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                checkout scmGit(
+                    branches: [[name: '*/master']], 
+                    extensions: [], 
+                    userRemoteConfigs: [[url: 'https://github.com/xx/Teedy.git']] // your github Repository
+            )
+            sh 'mvn -B -DskipTests clean package'
+        }
+    }
+    // Building Docker images
+    stage('Building image') {
+        steps {
+            script {
+                // assume Dockerfile locate at root 
+            docker.build("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}")
             }
         }
-
-        stage('Build Docker image') {
-            steps {
-                script {
-                    docker.build("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}")
-                }
-            }
-        }
-
-        stage('Push Docker image') {
-            steps {
-                script {
-                    retry(3) {
-                        docker.withRegistry('https://index.docker.io/v1/', params.DOCKER_HUB_CREDENTIALS) {
-                            docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()
-                            docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Run containers') {
-            steps {
-                script {
-                    [8082, 8083, 8084].each { port ->
-                        sh "docker stop teedy-container-${port} || true"
-                        sh "docker rm teedy-container-${port} || true"
-                        docker.image("${params.DOCKER_IMAGE}:${env.DOCKER_TAG}").run("--name teedy-container-${port} -d -p ${port}:8080")
-                    }
-                    sh 'docker ps --filter "name=teedy-container"'
+    }
+    // Uploading Docker images into Docker Hub
+    stage('Upload image') {
+        steps {
+            script {
+            // sign in Docker Hub
+            docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {// push image
+                docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push()// ：optional: label latest
+                docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").push('latest')
                 }
             }
         }
     }
-
-    post {
-        always {
-            archiveArtifacts artifacts: '**/target/**/*.war', fingerprint: true
-            archiveArtifacts artifacts: '**/target/**/*.jar', fingerprint: true, allowEmptyArchive: true
-            junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true
+    // Running Docker container
+    stage('Run containers') {
+        steps {
+            script {
+                // stop then remove containers if exists
+                sh 'docker stop teedy-container-8081 || true'
+                sh 'docker rm teedy-container-8081 || true'
+                // run Container
+                docker.image("${env.DOCKER_IMAGE}:${env.DOCKER_TAG}").run('--name teedy-container-8081 -d -p 8081:8080')
+                // Optional: list all teedy-containers
+                sh 'docker ps --filter "name=teedy-container"'
+                }
+            }
         }
     }
 }
